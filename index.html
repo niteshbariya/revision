@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>પુનરાવર્તન અને મેગા કસોટી કેન્દ્ર</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1f5f9; margin: 0; padding: 20px; }
+    .container { max-width: 720px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+    .header { text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: bold; margin: 3px; }
+    .module-badge { background-color: #e0f2fe; color: #0369a1; }
+    .chapter-badge { background-color: #fef3c7; color: #b45309; }
+    .mode-card { border: 2px solid #cbd5e1; border-radius: 8px; padding: 15px; margin: 15px 0; cursor: pointer; transition: 0.2s; }
+    .mode-card:hover { border-color: #2563eb; background: #f8fafc; }
+    .opt-btn { background: #f8fafc; border: 1.5px solid #cbd5e1; padding: 12px 15px; border-radius: 8px; text-align: left; font-size: 16px; cursor: pointer; width: 100%; margin-bottom: 10px; }
+    .correct { background-color: #dcfce7 !important; border-color: #22c55e !important; color: #15803d; font-weight: bold; }
+    .wrong { background-color: #fee2e2 !important; border-color: #ef4444 !important; color: #b91c1c; font-weight: bold; }
+    .explanation { margin-top: 15px; padding: 12px; background: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 4px; font-size: 15px; }
+    .btn-action { background: #2563eb; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; }
+    .input-box { width: 80%; padding: 10px; font-size: 16px; border: 1.5px solid #cbd5e1; border-radius: 6px; margin-bottom: 15px; text-align: center; }
+    .admin-link { background: none; border: none; color: #94a3b8; font-size: 13px; cursor: pointer; text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h2>🎯 પુનરાવર્તન કસોટી કેન્દ્ર</h2>
+    <p>ભૂલોનું સુધારણા અને મહા-કસોટી પોર્ટલ</p>
+  </div>
+
+  <!-- ૧. મોબાઇલ નંબર દાખલ કરવા માટે -->
+  <div id="step-mobile" style="text-align: center;">
+    <p>તમારો રજીસ્ટર્ડ ૧૦ અંકનો મોબાઈલ નંબર દાખલ કરો:</p>
+    <input type="tel" id="mobile-input" class="input-box" placeholder="મોબાઈલ નંબર" maxlength="10">
+    <br>
+    <button class="btn-action" onclick="checkData()">આગળ વધો ➔</button>
+  </div>
+
+  <!-- ૨. મોડ પસંદગી -->
+  <div id="step-modes" style="display: none;">
+    <p style="text-align: center; font-weight: bold;">કસોટીનો પ્રકાર પસંદ કરો:</p>
+    
+    <div class="mode-card" onclick="startDaily()">
+      <h3>⚡ ૧. દૈનિક સક્રિય પુનરાવર્તન</h3>
+      <p>માત્ર હજી સુધી ન સુધરેલી ભૂલો. (સાચો જવાબ પડતાં યાદીમાંથી નીકળી જશે)</p>
+      <small id="daily-count" style="color: #0369a1; font-weight: bold;"></small>
+    </div>
+
+    <div class="mode-card" onclick="startMega()">
+      <h3>🏆 ૨. મેગા મોક ટેસ્ટ (પ્રથમ પ્રયાસની તમામ ભૂલો) 🔒</h3>
+      <p>છેલ્લા ૨ મહિનામાં પ્રથમ પ્રયત્ને ખોટી પડેલી તમામ ભૂલોનો સંયુક્ત મોટો ટેસ્ટ.</p>
+      <small id="mega-count" style="color: #b45309; font-weight: bold;"></small>
+    </div>
+  </div>
+
+  <!-- ૩. પ્રશ્ન સ્ક્રીન -->
+  <div id="step-quiz" style="display: none;">
+    <div style="text-align: center; margin-bottom: 10px; color: #64748b;">
+      <span id="progress-info">પ્રશ્ન ૧ / ૧</span>
+    </div>
+    <div>
+      <span id="badge-module" class="badge module-badge">મોડ્યુલ</span>
+      <span id="badge-chapter" class="badge chapter-badge">પ્રકરણ</span>
+    </div>
+    <h3 id="question-text" style="margin: 15px 0;"></h3>
+    <div id="options-container"></div>
+    <div id="explanation-box" class="explanation" style="display: none;"></div>
+    <button id="next-btn" class="btn-action" style="float: right; margin-top: 15px;" onclick="nextQuestion()" disabled>આગળનો પ્રશ્ન ➔</button>
+    <div style="clear: both;"></div>
+  </div>
+
+  <!-- ૪. પૂર્ણ થયાનો સંદેશ -->
+  <div id="step-finished" style="display: none; text-align: center; padding: 30px 0;">
+    <h3>🎉 કસોટી પૂર્ણ થઈ ગઈ છે!</h3>
+    <p id="finish-msg"></p>
+    <button class="btn-action" onclick="location.reload()">મુખ્ય પેજ પર જાઓ</button>
+  </div>
+
+  <!-- ૫. એડમિન માટે ગુપ્ત એક્સેલ ડાઉનલોડ -->
+  <div style="text-align: center; margin-top: 35px; border-top: 1px dashed #cbd5e1; padding-top: 15px;">
+    <button onclick="downloadExcel()" class="admin-link">🔒 Admin Export (Excel)</button>
+  </div>
+</div>
+
+<script>
+  let mobile = "";
+  let activeList = [];
+  let masterList = [];
+  let currentExam = [];
+  let currentIdx = 0;
+  let isDaily = true;
+
+  // ૧. મોબાઈલ નંબર ચકાસણી
+  function checkData() {
+    mobile = document.getElementById('mobile-input').value.trim();
+    if (mobile.length < 10) {
+      alert("કૃપા કરીને માન્ય ૧૦ અંકનો મોબાઈલ નંબર નાખો.");
+      return;
+    }
+    activeList = JSON.parse(localStorage.getItem('active_errors_' + mobile) || '[]');
+    masterList = JSON.parse(localStorage.getItem('master_errors_' + mobile) || '[]');
+
+    document.getElementById('daily-count').innerText = `ઉપલબ્ધ બાકી પ્રશ્નો: ${activeList.length}`;
+    document.getElementById('mega-count').innerText = `કુલ મૂળ પ્રશ્નો: ${masterList.length}`;
+
+    document.getElementById('step-mobile').style.display = 'none';
+    document.getElementById('step-modes').style.display = 'block';
+  }
+
+  // ૨. દૈનિક ટેસ્ટ શરૂ
+  function startDaily() {
+    if (activeList.length === 0) {
+      alert("દૈનિક યાદીમાં કોઈ પ્રશ્ન બાકી નથી!");
+      return;
+    }
+    isDaily = true;
+    currentExam = [...activeList];
+    launch();
+  }
+
+  // ૩. મેગા ટેસ્ટ શરૂ (OTP સાથે)
+  function startMega() {
+    if (masterList.length === 0) {
+      alert("મેગા ટેસ્ટ માટે હજુ સુધી કોઈ પ્રશ્નો નોંધાયા નથી!");
+      return;
+    }
+    let otp = prompt("મેગા ટેસ્ટ શરૂ કરવા માટે OTP દાખલ કરો:");
+    if (!otp) return;
+    
+    isDaily = false;
+    currentExam = [...masterList];
+    launch();
+  }
+
+  // ૪. ક્વિઝ લોડ
+  function launch() {
+    document.getElementById('step-modes').style.display = 'none';
+    document.getElementById('step-quiz').style.display = 'block';
+    currentIdx = 0;
+    render(currentIdx);
+  }
+
+  function render(idx) {
+    const q = currentExam[idx];
+    document.getElementById('progress-info').innerText = `પ્રશ્ન ${idx + 1} / ${currentExam.length}`;
+    document.getElementById('badge-module').innerText = q.module || "સામાન્ય";
+    document.getElementById('badge-chapter').innerText = q.chapter || "સામાન્ય";
+    document.getElementById('question-text').innerText = q.question;
+
+    const optBox = document.getElementById('options-container');
+    optBox.innerHTML = '';
+    document.getElementById('explanation-box').style.display = 'none';
+    document.getElementById('next-btn').disabled = true;
+
+    q.options.forEach((opt, optIdx) => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.innerText = opt;
+      btn.onclick = () => selectOpt(optIdx, q.correctAnswer, q.explanation, q);
+      optBox.appendChild(btn);
+    });
+  }
+
+  function selectOpt(sel, cor, exp, item) {
+    const btns = document.querySelectorAll('.opt-btn');
+    btns.forEach(b => b.disabled = true);
+
+    if (sel === cor) {
+      btns[sel].classList.add('correct');
+      if (isDaily) {
+        // દૈનિકમાંથી રિમૂવ કરો (માસ્ટરમાં રહેશે)
+        activeList = activeList.filter(i => i.question !== item.question);
+        localStorage.setItem('active_errors_' + mobile, JSON.stringify(activeList));
+      }
+    } else {
+      btns[sel].classList.add('wrong');
+      btns[cor].classList.add('correct');
+    }
+
+    if (exp) {
+      const eBox = document.getElementById('explanation-box');
+      eBox.innerText = "સમજૂતી: " + exp;
+      eBox.style.display = 'block';
+    }
+    document.getElementById('next-btn').disabled = false;
+  }
+
+  function nextQuestion() {
+    if (currentIdx < currentExam.length - 1) {
+      currentIdx++;
+      render(currentIdx);
+    } else {
+      document.getElementById('step-quiz').style.display = 'none';
+      document.getElementById('step-finished').style.display = 'block';
+      document.getElementById('finish-msg').innerText = isDaily ? "દૈનિક રિવિઝન સફળતાપૂર્વક પૂર્ણ થયું." : "મેગા મોક ટેસ્ટ પૂર્ણ થયો છે.";
+    }
+  }
+
+  // ૫. ફક્ત એડમિન માટે Excel (CSV) ડાઉનલોડ (PIN: 9898)
+  function downloadExcel() {
+    const pin = prompt("એડમિન સુરક્ષા પિન દાખલ કરો:");
+    if (pin !== "9898") {
+      alert("ખોટો પિન! ફક્ત એડમિન ડાઉનલોડ કરી શકે છે.");
+      return;
+    }
+
+    let rows = [["તારીખ", "મોબાઇલ નંબર", "મોડ્યુલ", "પ્રકરણ", "પ્રશ્ન", "સાચો જવાબ", "સમજૂતી"]];
+
+    for (let i = 0; i < localStorage.length; i++) {
+      let k = localStorage.key(i);
+      if (k.startsWith("master_errors_")) {
+        let mob = k.replace("master_errors_", "");
+        let qArr = JSON.parse(localStorage.getItem(k) || "[]");
+
+        qArr.forEach(q => {
+          let cleanQ = `"${(q.question || '').replace(/"/g, '""')}"`;
+          let cleanAns = `"${(q.options && q.options[q.correctAnswer] ? q.options[q.correctAnswer] : q.correctAnswer || '').replace(/"/g, '""')}"`;
+          let cleanExp = `"${(q.explanation || '').replace(/"/g, '""')}"`;
+          let cleanMod = `"${(q.module || '').replace(/"/g, '""')}"`;
+          let cleanChp = `"${(q.chapter || '').replace(/"/g, '""')}"`;
+          let dt = `"${q.dateAdded || ''}"`;
+
+          rows.push([dt, `'${mob}`, cleanMod, cleanChp, cleanQ, cleanAns, cleanExp]);
+        });
+      }
+    }
+
+    if (rows.length <= 1) {
+      alert("હજી સુધી કોઈ ખોટા પ્રશ્નોનો ડેટા સ્ટોર થયો નથી!");
+      return;
+    }
+
+    let csv = "\uFEFF";
+    rows.forEach(r => { csv += r.join(",") + "\r\n"; });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `Students_Mistakes_Export.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>
+</body>
+</html>
